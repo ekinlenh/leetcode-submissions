@@ -5,37 +5,40 @@
 #         self.next = next
 class Solution:
     def isPalindrome(self, head: Optional[ListNode]) -> bool:
-        # idea:
-        # get the half-way mark of the palindrome
-        # store each element in a stack
-        # and traverse the right half of the list, checking with stack
-        # if not equal, return False
-        # need to differentiate between odd and even size
-
-        size = 0
-        curr = head
-        while (curr):
-            size += 1
-            curr = curr.next
-        
-        if size == 0:
+        # last solution using stack was time O(n) and space O(n)
+        # we can make this time O(n) and O(1) space using fast/slow pointers
+        # slow pointer will be at middle point of the list
+        # then we can reverse the first half of the list
+        # and traverse normally with slow pointer until end and see if values are equal
+        if not head or not head.next:
             return True
+                
+        slow, fast = head, head
 
-        stack = []
-        curr = head
-        idx = 0
-        while (idx < (size // 2)):
-            stack.append(curr.val)
-            curr = curr.next
-            idx += 1
+        # find middle while reversing first half
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+
+        if fast:  # is odd
+            slow = slow.next
         
-        if (size % 2) == 1: # is odd
-            curr = curr.next
-        
-        while (curr):
-            val = stack.pop()
-            if curr.val != val:
+        prev = None
+
+        while slow:
+            next_node = slow.next
+            slow.next = prev
+            prev = slow
+            slow = next_node
+
+        left = head
+        right = prev
+
+        while right:
+            if left.val != right.val:
                 return False
-            curr = curr.next
+            
+            left = left.next
+            right = right.next
         
         return True
