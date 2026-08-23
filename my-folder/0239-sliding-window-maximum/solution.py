@@ -1,25 +1,28 @@
 class Solution:
     def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
-        # for each window, we want to keep track of the max value
-        # we can do this using a max-heap
-        # to make sure the max always stays in bounds in the window range
-        # we track the index of each max_value
-        # when window_size == k, we pop from heap until a valid max
-        # then we can move the window to the right one posiiton
-
-        max_heap = []
-        heapq.heapify(max_heap)
+        # use a deque (monotonic)
+        # indices are sorted left -> right, while also carrying current val
+        # until we get to size k, we want to append (val, index)
+        # we keep the deque in decreasing order, pop all vals less than the val we add to the window
+        # the max val will always be at deque[0][0] which we only pop when window size == k and we move it
 
         res = []
+        dq = deque()
+
         start = 0
         for end in range(len(nums)):
-            heapq.heappush(max_heap, (-nums[end], end))
+            # maintain decreasing order
+            while dq and dq[-1][0] <= nums[end]:
+                dq.pop()
+
+            # add element at end to window
+            dq.append((nums[end], end))
+
+            # check if window size == k
             if (end - start + 1) == k:
-                # go until valid max value in window
-                while max_heap[0][1] < start or max_heap[0][1] > end:
-                    heapq.heappop(max_heap)
-                # valid max_value
-                res.append(-max_heap[0][0])
+                if dq and dq[0][1] < start:
+                    dq.popleft()
+                res.append(dq[0][0])
                 start += 1
         
         return res
