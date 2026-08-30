@@ -1,24 +1,30 @@
 class Solution:
     def threeSumClosest(self, nums: List[int], target: int) -> int:
-        # like 3Sum, we want to sort the nums array
-        # the difference now is that we want to check for a difference between 
-        # three indices sum and the actual target and we want the lowest difference
+        # very similar to 3 sum
+        # except we want to keep track of the closest target (i.e. abs difference from target to sum)
+        
+        res = -1
+        lowest_diff = float('inf')
 
-        closest = nums[0] + nums[1] + nums[2] # will store the three integers that we can just sum at the end
-        nums.sort() # to make it easier to traverse and find closest to target
+        nums.sort() # sort nums again to make it easier to traverse
         for i in range(len(nums)):
             left = i + 1
             right = len(nums) - 1
             while left < right:
-                ans = nums[i] + nums[left] + nums[right]
+                added = nums[i] + nums[left] + nums[right]
+                diff = abs(target - added) # we want the closest diff as possible
+
+                if diff < lowest_diff:
+                    lowest_diff = diff
+                    res = added
                 
-                diff = abs(target - ans)
-                if diff < abs(target - closest):
-                    closest = ans
-                    
-                if ans > target:
+                # to traverse, i want to consider how i can make diff the lowest it can be
+                if added < target:
+                    left += 1
+                elif added > target:
                     right -= 1
                 else:
-                    left += 1
+                    return added
                 
-        return closest
+        return res
+
